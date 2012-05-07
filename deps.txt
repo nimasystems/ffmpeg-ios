@@ -1,0 +1,11 @@
+FAAC: http://www.audiocoding.com/downloads.html
+LAME: http://lame.sourceforge.net/download.php
+OGG: http://xiph.org/downloads/
+THEORA: http://xiph.org/downloads/
+VORBIS: http://xiph.org/downloads/
+SPEEX: http://xiph.org/downloads/
+FISHSOUND: http://xiph.org/downloads/
+OGGZ: http://xiph.org/downloads/
+LIBMMS: http://sourceforge.net/projects/libmms/
+LIBAACPLUS: http://tipok.org.ua/ru/taxonomy/term/36
+ID3LIB: http://id3lib.sourceforge.net/
