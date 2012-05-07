@@ -8,7 +8,7 @@ DIST_DIR_BASE=${DIST_DIR_BASE:="$SCRIPT_DIR/dist"}
 if [ -d ffmpeg ]
 then
   echo "Found ffmpeg source directory, no need to update anything"
-  exit 0
+  #exit 0
 else
   echo "Fetching ffmpeg..."
   git clone git://source.ffmpeg.org/ffmpeg.git
@@ -26,6 +26,6 @@ do
     if [ -d patches ]
     then
         echo "Applying patches to source in directory $FFMPEG_DIR"
-        git apply -v --directory=$FFMPEG_DIR patches/*
+        git apply -v --directory=$FFMPEG_DIR patches/0001-iOS-SDK-Fixes.patch
     fi
 done

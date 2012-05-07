@@ -1,10 +1,7 @@
 #!/bin/sh
 
 ARCHS=${ARCHS:-"armv6 armv7 i386"}
-ALL_LIBS="FAAC LAME OGG THEORA VORBIS SPEEX"
-
-#ARCHS=i386
-#ALL_LIBS="LAME"
+ALL_LIBS="FAAC LAME OGG OGGZ THEORA VORBIS SPEEX FLAC FISHSOUND MMS AACPLUS"
 
 PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
 SDKVER=5.1
@@ -26,6 +23,9 @@ LAME_OPTIONS="--disable-frontend --disable-nasm"
 OGG_DIR="$SCRIPT_DIR/libogg"
 OGG_OPTIONS=""
 
+OGGZ_DIR="$SCRIPT_DIR/liboggz"
+OGGZ_OPTIONS="--enable-experimental  --disable-oggtest"
+
 THEORA_DIR="$SCRIPT_DIR/libtheora"
 THEORA_OPTIONS="--disable-valgrind-testing --disable-oggtest --disable-vorbistest --disable-sdltest --disable-float --disable-encode --disable-examples"
 
@@ -35,7 +35,27 @@ VORBIS_OPTIONS="--disable-oggtest --disable-docs"
 SPEEX_DIR="$SCRIPT_DIR/speex"
 SPEEX_OPTIONS="--disable-oggtest"
 
+FLAC_DIR="$SCRIPT_DIR/flac"
+FLAC_OPTIONS="--disable-thorough-tests  --disable-doxygen-docs   --disable-xmms-plugin  --disable-oggtest --without-libiconv-prefix"
+
+FISHSOUND_DIR="$SCRIPT_DIR/libfishsound"
+FISHSOUND_OPTIONS="--enable-experimental"
+
+MMS_DIR="$SCRIPT_DIR/libmms"
+MMS_OPTIONS=""
+
+AACPLUS_DIR="$SCRIPT_DIR/libaacplus"
+AACPLUS_OPTIONS="--without-fftw3 --with-parameter-expansion-string-replace-capable-shell=/bin/bash"
+
 ### NO CHANGES FROM HERE ON
+
+if [ -n "$1" ]; then
+	ALL_LIBS="$1"
+fi
+
+if [ -n "$2" ]; then
+	ARCHS="$2"
+fi
 
 export SDKVER
 export SHAREDLIBS
@@ -103,7 +123,7 @@ do
 	EXTRA_CONFIGURE_FLAGS=""
     
 	# extra options depending on arch for THEORA/VORBIS/SPEEX
-	if [ $LIB = "THEORA" ] || [ $LIB = "VORBIS" ] || [ $LIB = "SPEEX" ]; then
+	if [ $LIB = "THEORA" ] || [ $LIB = "VORBIS" ] || [ $LIB = "SPEEX" ] || [ $LIB = "FLAC" ] || [ $LIB = "OGGZ" ] ; then
 	    EXTRA_CONFIGURE_FLAGS="$EXTRA_CONFIGURE_FLAGS --with-ogg=$SHAREDLIBS/$SDKVER/$ARCH --with-ogg-libraries=$SHAREDLIBS/$SDKVER/$ARCH/lib/ --with-ogg-includes=$SHAREDLIBS/$SDKVER/$ARCH/include/"
 	fi
 	
@@ -151,7 +171,7 @@ echo "All deps built successfully!"
 # combine all
 echo "Combining architectures..."
 cd "$SCRIPT_DIR"
-./combine.sh
+$SCRIPT_DIR/combine.sh
 
 [ $? -eq 0 ] || {
 	echo "Error while combining archs"
@@ -159,6 +179,6 @@ cd "$SCRIPT_DIR"
 }
 
 # output the end result
-lipo -info "$SHAREDLIBS/$SDKVER/fat/lib/*
+lipo -info $SHAREDLIBS/$SDKVER/fat/lib/*
 
 exit 0

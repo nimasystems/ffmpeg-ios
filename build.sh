@@ -72,6 +72,7 @@ do
     --enable-libtheora \
     --enable-libfaac \
     --enable-libvorbis \
+    --enable-libaacplus \
     --prefix=$DIST_DIR \
     --enable-cross-compile --target-os=darwin --arch=$ARCH \
     --extra-ldflags="-L${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk/usr/lib/system -L$SHAREDLIBS/$IOSSDKVERSION/$ARCH/lib" \
@@ -106,3 +107,18 @@ do
       rm -rf $DIST_DIR/share
     fi
 done
+
+# combine all
+echo "Combining architectures..."
+cd "$SCRIPT_DIR"
+$SCRIPT_DIR/combine.sh
+
+[ $? -eq 0 ] || {
+	echo "Error while combining archs"
+	exit 6
+}
+
+# output the end result
+lipo -info $SHAREDLIBS/$IOSSDKVERSION/fat/lib/*
+
+exit 0

@@ -2,15 +2,15 @@
 
 set -e
 
-if [ -z $ARCHS ]; then
+if [ -z "$ARCHS" ]; then
     export ARCHS="armv6 armv7 i386"
 fi
 
-if [ -z $SHAREDLIBS ]; then
+if [ -z "$SHAREDLIBS" ]; then
     export SHAREDLIBS="/opt/ios"
 fi
 
-if [ -z $SDKVER ]; then
+if [ -z "$SDKVER" ]; then
     export SDKVER="5.1"
 fi
 

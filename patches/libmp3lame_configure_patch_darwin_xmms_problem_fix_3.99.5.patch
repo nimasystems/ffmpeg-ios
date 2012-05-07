@@ -1,0 +1,143 @@
+Only in ../lame/ACM/ADbg: Makefile
+Only in ../lame/ACM: Makefile
+Only in ../lame/ACM/ddk: Makefile
+Only in ../lame/ACM/tinyxml: Makefile
+Only in ../lame/Dll: Makefile
+Only in ../lame/: Makefile
+diff -crB lame-3.99.5/Makefile.unix ../lame/Makefile.unix
+*** lame-3.99.5/Makefile.unix	2011-10-02 20:13:24.000000000 +0300
+--- ../lame/Makefile.unix	2012-05-07 12:02:15.000000000 +0300
+***************
+*** 155,161 ****
+  ifeq ($(CFG),RH)
+     GTK = -DHAVE_GTK `gtk-config --cflags`
+     GTKLIBS = `gtk-config --libs`
+!    CPP_OPTS += -DFLOAT8=float -DREAL_IS_FLOAT=1 -DHAVE_ICONV -DHAVE_XMMINTRIN_H -D_ALLOW_INTERNAL_OPTIONS
+  # these options for gcc-3.2 & AthlonXP
+     CC_OPTS = \
+  	-pipe -O3 \
+--- 155,161 ----
+  ifeq ($(CFG),RH)
+     GTK = -DHAVE_GTK `gtk-config --cflags`
+     GTKLIBS = `gtk-config --libs`
+!    CPP_OPTS += -DFLOAT8=float -DREAL_IS_FLOAT=1 -DHAVE_ICONV -D_ALLOW_INTERNAL_OPTIONS
+  # these options for gcc-3.2 & AthlonXP
+     CC_OPTS = \
+  	-pipe -O3 \
+***************
+*** 173,179 ****
+  ifeq ($(CFG),RH_SSE)
+     GTK = -DHAVE_GTK `gtk-config --cflags`
+     GTKLIBS = `gtk-config --libs`
+!    CPP_OPTS += -DFLOAT8=float -DREAL_IS_FLOAT=1 -DHAVE_ICONV -DHAVE_XMMINTRIN_H -DMIN_ARCH_SSE -D_ALLOW_INTERNAL_OPTIONS
+  # these options for gcc-3.2 & AthlonXP
+     CC_OPTS = \
+  	-std=c99 -pipe -O3 -fstrict-aliasing \
+--- 173,179 ----
+  ifeq ($(CFG),RH_SSE)
+     GTK = -DHAVE_GTK `gtk-config --cflags`
+     GTKLIBS = `gtk-config --libs`
+!    CPP_OPTS += -DFLOAT8=float -DREAL_IS_FLOAT=1 -DHAVE_ICONV -DMIN_ARCH_SSE -D_ALLOW_INTERNAL_OPTIONS
+  # these options for gcc-3.2 & AthlonXP
+     CC_OPTS = \
+  	-std=c99 -pipe -O3 -fstrict-aliasing \
+***************
+*** 201,207 ****
+     CC=icc
+     GTK = -DHAVE_GTK `gtk-config --cflags`
+     GTKLIBS = `gtk-config --libs`
+!    CPP_OPTS += -DFLOAT8=float -DREAL_IS_FLOAT=1 -DHAVE_ICONV -DHAVE_XMMINTRIN_H -DMIN_ARCH_SSE -D_ALLOW_INTERNAL_OPTIONS
+  
+    CC_OPTS = \
+  	-cxxlib-nostd \
+--- 201,207 ----
+     CC=icc
+     GTK = -DHAVE_GTK `gtk-config --cflags`
+     GTKLIBS = `gtk-config --libs`
+!    CPP_OPTS += -DFLOAT8=float -DREAL_IS_FLOAT=1 -DHAVE_ICONV -DMIN_ARCH_SSE -D_ALLOW_INTERNAL_OPTIONS
+  
+    CC_OPTS = \
+  	-cxxlib-nostd \
+Only in ../lame/: config.h
+diff -crB lame-3.99.5/config.h.in ../lame/config.h.in
+*** lame-3.99.5/config.h.in	2012-02-14 12:35:57.000000000 +0200
+--- ../lame/config.h.in	2012-05-07 12:02:49.000000000 +0300
+***************
+*** 193,199 ****
+  #undef HAVE_UNISTD_H
+  
+  /* Define to 1 if you have the <xmmintrin.h> header file. */
+- #undef HAVE_XMMINTRIN_H
+  
+  /* Define as const if the declaration of iconv() needs const. */
+  #undef ICONV_CONST
+--- 193,198 ----
+Only in ../lame/: config.status
+diff -crB lame-3.99.5/configMS.h ../lame/configMS.h
+*** lame-3.99.5/configMS.h	2012-02-07 16:04:51.000000000 +0200
+--- ../lame/configMS.h	2012-05-07 12:01:46.000000000 +0300
+***************
+*** 104,120 ****
+  
+  #ifdef HAVE_NASM
+      #if (defined(__ICL) && (__ICL >= 450))
+-         #define HAVE_XMMINTRIN_H
+      #elif defined(_MSC_VER)
+          #include <malloc.h>
+-         #ifdef _mm_malloc
+-             #define HAVE_XMMINTRIN_H
+-         #endif
+      #endif
+  #endif
+  
+- #if defined(_M_X64) && !defined(HAVE_XMMINTRIN_H)
+-         #define HAVE_XMMINTRIN_H
+- #endif
+- 
+  #endif
+--- 104,112 ----
+Only in ../lame/debian: Makefile
+Only in ../lame/doc: Makefile
+Only in ../lame/doc/html: Makefile
+Only in ../lame/doc/man: Makefile
+Only in ../lame/dshow: Makefile
+Only in ../lame/frontend: .deps
+Only in ../lame/frontend: Makefile
+Only in ../lame/include: Makefile
+Only in ../lame/: ios-configure
+Only in ../lame/libmp3lame: .deps
+Only in ../lame/libmp3lame: Makefile
+Only in ../lame/libmp3lame/i386: Makefile
+Only in ../lame/libmp3lame/vector: .deps
+Only in ../lame/libmp3lame/vector: Makefile
+Only in ../lame/: libtool
+Only in ../lame/mac: Makefile
+Only in ../lame/macosx/English.lproj: Makefile
+Only in ../lame/macosx/LAME.xcodeproj: Makefile
+Only in ../lame/macosx: Makefile
+Only in ../lame/misc: .deps
+Only in ../lame/misc: Makefile
+Only in ../lame/mpglib: .deps
+Only in ../lame/mpglib: Makefile
+Only in ../lame/: stamp-h1
+Only in ../lame/vc_solution: Makefile
+diff -crB lame-3.99.5/vc_solution/arch_sse2.vsprops ../lame/vc_solution/arch_sse2.vsprops
+*** lame-3.99.5/vc_solution/arch_sse2.vsprops	2009-02-13 05:47:43.000000000 +0200
+--- ../lame/vc_solution/arch_sse2.vsprops	2012-05-07 12:03:30.000000000 +0300
+***************
+*** 6,12 ****
+  	>
+  	<Tool
+  		Name="VCCLCompilerTool"
+! 		PreprocessorDefinitions="HAVE_XMMINTRIN_H;MIN_ARCH_SSE"
+  		EnableEnhancedInstructionSet="2"
+  		FloatingPointModel="2"
+  	/>
+--- 6,12 ----
+  	>
+  	<Tool
+  		Name="VCCLCompilerTool"
+! 		PreprocessorDefinitions="MIN_ARCH_SSE"
+  		EnableEnhancedInstructionSet="2"
+  		FloatingPointModel="2"
+  	/>
