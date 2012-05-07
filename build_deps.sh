@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ARCHS=${ARCHS:-"armv6 armv7 i386"}
-ALL_LIBS="FAAC LAME OGG OGGZ THEORA VORBIS SPEEX FLAC FISHSOUND MMS AACPLUS"
+ALL_LIBS="FAAC LAME OGG OGGZ THEORA VORBIS SPEEX FLAC FISHSOUND MMS AACPLUS ID3LIB"
 
 PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
 SDKVER=5.1
@@ -46,6 +46,9 @@ MMS_OPTIONS=""
 
 AACPLUS_DIR="$SCRIPT_DIR/libaacplus"
 AACPLUS_OPTIONS="--without-fftw3 --with-parameter-expansion-string-replace-capable-shell=/bin/bash"
+
+ID3LIB_DIR="$SCRIPT_DIR/id3lib"
+ID3LIB_OPTIONS=""
 
 ### NO CHANGES FROM HERE ON
 
