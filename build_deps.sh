@@ -1,10 +1,10 @@
 #!/bin/sh
 
-#ARCHS=${ARCHS:-"armv6 armv7 i386"}
-#ALL_LIBS="FAAC LAME OGG THEORA VORBIS SPEEX"
+ARCHS=${ARCHS:-"armv6 armv7 i386"}
+ALL_LIBS="FAAC LAME OGG THEORA VORBIS SPEEX"
 
-ARCHS=i386
-ALL_LIBS="LAME"
+#ARCHS=i386
+#ALL_LIBS="LAME"
 
 PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
 SDKVER=5.1
@@ -49,6 +49,7 @@ do
     
     [ -d $LIB_DIR ] || {
 	echo "Library $LIB not found"
+	echo "Remember to apply the necessary patches in ./patches before building!"
 	exit 1
     } 
 done
@@ -140,8 +141,24 @@ do
 	    echo "Error while making $LIB."
 	    exit 5
 	}
+
+	cd ..
     done
 done
 
 echo "All deps built successfully!"
+
+# combine all
+echo "Combining architectures..."
+cd "$SCRIPT_DIR"
+./combine.sh
+
+[ $? -eq 0 ] || {
+	echo "Error while combining archs"
+	exit 6
+}
+
+# output the end result
+lipo -info "$SHAREDLIBS/$SDKVER/fat/lib/*
+
 exit 0
