@@ -4,8 +4,7 @@ PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
 IOSSDKVERSION=5.1
 SHAREDLIBS="/opt/ios"
 
-#ARCHS=${ARCHS:-"armv6 armv7 i386"}
-ARCHS=i386
+ARCHS=${ARCHS:-"armv6 armv7 i386"}
 
 ARCHFAT="fat"
 
