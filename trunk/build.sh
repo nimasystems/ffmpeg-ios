@@ -1,10 +1,10 @@
 #!/bin/sh
 
 PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
-IOSSDKVERSION=5.1
+IOSSDKVERSION=6.1
 SHAREDLIBS="/opt/ios"
 
-ARCHS=${ARCHS:-"armv6 armv7 i386"}
+ARCHS=${ARCHS:-"armv7 i386"}
 
 ARCHFAT="fat"
 
@@ -59,7 +59,7 @@ do
             ;;
     esac
 
-    EXTRA_CFLAGS="$EXTRA_CFLAGS -I$SHAREDLIBS/$IOSSDKVERSION/$ARCH/include -L$SHAREDLIBS/$IOSSDKVERSION/$ARCH/lib"
+    EXTRA_CFLAGS="$EXTRA_CFLAGS -I$SHAREDLIBS/$IOSSDKVERSION/$ARCH/include -L$SHAREDLIBS/$IOSSDKVERSION/$ARCH/lib -I$SHAREDLIBS/$SDKVER/$ARCH/include -L$SHAREDLIBS/$SDKVER/$ARCH/lib"
 
     echo "Configuring ffmpeg for $ARCH (using $SHAREDLIBS/$IOSSDKVERSION/$ARCH path for external libraries)..."
     ./configure \
