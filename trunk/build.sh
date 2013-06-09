@@ -2,26 +2,31 @@
 
 PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
 IOSSDKVERSION=6.1
-SHAREDLIBS="/opt/ios"
+PREFIX="`pwd`/build"
 
 ARCHS=${ARCHS:-"armv7 i386"}
-
 ARCHFAT="fat"
 
 set -e
 
 SCRIPT_DIR=$( (cd -P $(dirname $0) && pwd) )
-DIST_DIR_BASE="$SHAREDLIBS/$IOSSDKVERSION"
+DIST_DIR_BASE="$PREFIX/$IOSSDKVERSION"
 
-if [ ! -d ffmpeg ]
+if [ ! -d $SCRIPT_DIR/dist/ffmpeg ]
 then
   echo "ffmpeg source directory does not exist, run sync.sh"
   exit 1
 fi
 
+export DEVROOT="$PLATFORMBASE/iPhoneOS.platform/Developer"
+export SDKROOT="$DEVROOT/SDKs/iPhoneOS$IOSSDKVERSION.sdk"
+
 for ARCH in $ARCHS
 do
-    FFMPEG_DIR=ffmpeg-$ARCH
+    export PFX=$PREFIX/$IOSSDKVERSION/$ARCH
+    export PKG_CONFIG_PATH=$SDKROOT/usr/lib/pkgconfig:$DEVROOT/usr/lib/pkgconfig:$PFX/lib/pkgconfig
+
+    FFMPEG_DIR=$SCRIPT_DIR/dist/ffmpeg-$ARCH
     if [ ! -d $FFMPEG_DIR ]
     then
       echo "Directory $FFMPEG_DIR does not exist, run sync.sh"
@@ -59,9 +64,9 @@ do
             ;;
     esac
 
-    EXTRA_CFLAGS="$EXTRA_CFLAGS -I$SHAREDLIBS/$IOSSDKVERSION/$ARCH/include -L$SHAREDLIBS/$IOSSDKVERSION/$ARCH/lib -I$SHAREDLIBS/$SDKVER/$ARCH/include -L$SHAREDLIBS/$SDKVER/$ARCH/lib"
+    EXTRA_CFLAGS="$EXTRA_CFLAGS -I$PREFIX/$IOSSDKVERSION/$ARCH/include -L$PREFIX/$IOSSDKVERSION/$ARCH/lib -I$PREFIX/$IOSSDKVERSION/$ARCH/include -L$PREFIX/$IOSSDKVERSION/$ARCH/lib"
 
-    echo "Configuring ffmpeg for $ARCH (using $SHAREDLIBS/$IOSSDKVERSION/$ARCH path for external libraries)..."
+    echo "Configuring ffmpeg for $ARCH (using $PREFIX/$IOSSDKVERSION/$ARCH path for external libraries)..."
     ./configure \
     --enable-zlib \
     --enable-version3 \
@@ -74,7 +79,7 @@ do
     --enable-libaacplus \
     --prefix=$DIST_DIR \
     --enable-cross-compile --target-os=darwin --arch=$ARCH \
-    --extra-ldflags="-L${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk/usr/lib/system -L$SHAREDLIBS/$IOSSDKVERSION/$ARCH/lib" \
+    --extra-ldflags="-L${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk/usr/lib/system -L$PREFIX/$IOSSDKVERSION/$ARCH/lib" \
     --cross-prefix="${PLATFORM}/Developer/usr/bin/" \
     --sysroot="${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk" \
     --disable-doc \
@@ -82,8 +87,10 @@ do
     --disable-ffplay \
     --disable-ffserver \
     --disable-ffprobe \
+    --disable-decoder=h264,svq3 \
+    --disable-parser=h264 \
     --as="gas-preprocessor.pl ${PLATFORM}/Applications/Xcode.app/Contents/Developer/usr/bin/as" \
-    --extra-ldflags="-arch $ARCH -L$SHAREDLIBS/$IOSSDKVERSION/$ARCH/lib" \
+    --extra-ldflags="-arch $ARCH -L$PREFIX/$IOSSDKVERSION/$ARCH/lib" \
     --extra-cflags="-arch $ARCH $EXTRA_CFLAGS" \
     --extra-cxxflags="-arch $ARCH" \
     $EXTRA_FLAGS
@@ -108,16 +115,16 @@ do
 done
 
 # combine all
-echo "Combining architectures..."
-cd "$SCRIPT_DIR"
-$SCRIPT_DIR/combine.sh
+#echo "Combining architectures..."
+#cd "$SCRIPT_DIR"
+#$SCRIPT_DIR/combine.sh
 
-[ $? -eq 0 ] || {
-	echo "Error while combining archs"
-	exit 6
-}
+#[ $? -eq 0 ] || {
+#	echo "Error while combining archs"
+#	exit 6
+#}
 
 # output the end result
-lipo -info $SHAREDLIBS/$IOSSDKVERSION/fat/lib/*
+#lipo -info $SHAREDLIBS/$IOSSDKVERSION/fat/lib/*
 
 exit 0
