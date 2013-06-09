@@ -3,7 +3,7 @@
 set -e
 
 if [ -z "$ARCHS" ]; then
-    export ARCHS="armv6 armv7 i386"
+    export ARCHS="armv7 i386"
 fi
 
 if [ -z "$SHAREDLIBS" ]; then
@@ -11,7 +11,7 @@ if [ -z "$SHAREDLIBS" ]; then
 fi
 
 if [ -z "$SDKVER" ]; then
-    export SDKVER="5.1"
+    export SDKVER="6.1"
 fi
 
 # start

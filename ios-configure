@@ -19,7 +19,7 @@ if [ -z $ARCH ]; then
 fi
 
 if [ -z $SDKVER ]; then
-    export SDKVER="5.1"
+    export SDKVER="6.1"
 fi
 
 if [ -z $DEVROOT ]; then
