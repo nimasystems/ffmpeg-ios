@@ -10,10 +10,6 @@ unset DYLD_FALLBACK_FRAMEWORK_PATH
 unset CPP
 unset CXXCPP
 
-if [ -z $SHAREDLIBS ]; then
-    export SHAREDLIBS="/opt/ios"
-fi
-
 if [ -z $ARCH ]; then
     export ARCH=armv7
 fi
@@ -30,21 +26,17 @@ if [ -z $SDKROOT ]; then
     export SDKROOT="$DEVROOT/SDKs/iPhoneOS$SDKVER.sdk"
 fi
 
-#export SHAREDLIBS="/opt/ios"
-#export ARCH=armv6
-#export SDKVER="5.1"
-#export DEVROOT="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer"
-#export SDKROOT="$DEVROOT/SDKs/iPhoneOS$SDKVER.sdk"
-
+#export BUILD_DARWIN_VER=10
 export BUILD_DARWIN_VER=`uname -r`
-export PKG_CONFIG_PATH=$SDKROOT/usr/lib/pkgconfig:$DEVROOT/usr/lib/pkgconfig:$SHAREDLIBS/$SDKVER/$ARCH/lib/pkgconfig
-export PREFIX="$SHAREDLIBS/$SDKVER/$ARCH"
+#export PKG_CONFIG_PATH=$SDKROOT/usr/lib/pkgconfig:$DEVROOT/usr/lib/pkgconfig
+export PKG_CONFIG_PATH=$SDKROOT/usr/lib/pkgconfig:$DEVROOT/usr/lib/pkgconfig:$PFX/lib/pkgconfig
 export AS="$DEVROOT/usr/bin/as"
 export ASCPP="$DEVROOT/usr/bin/as"
 export AR="$DEVROOT/usr/bin/ar"
 export RANLIB="$DEVROOT/usr/bin/ranlib"
-export CFLAGS="-arch $ARCH -pipe -no-cpp-precomp -isysroot $SDKROOT --sysroot $SDKROOT -I$SDKROOT/usr/include -I$SHAREDLIBS/$SDKVER/$ARCH/include"
-export CFLAGS="$CFLAGS -I$SHAREDLIBS/$SDKVER/$ARCH/include -L$SHAREDLIBS/$SDKVER/$ARCH/lib"
+export CFLAGS="-arch $ARCH -pipe -no-cpp-precomp -isysroot $SDKROOT --sysroot $SDKROOT -I$SDKROOT/usr/include -I$PFX/include"
+#export CFLAGS="-arch $ARCH -pipe -no-cpp-precomp -isysroot $SDKROOT --sysroot $SDKROOT -I$SDKROOT/usr/include -I$PFX/include -I$PFX/include/speex -I$PFX/include/FLAC -I$PFX/include/FLAC++ -I$PFX/include/lame -I$PFX/include/libmms -I$PFX/include/ogg -I$PFX/include/oggz -I$PFX/include/theora -I$PFX/include/vorbis"
+#export CFLAGS="$CFLAGS"
 
 #export CPP="$DEVROOT/usr/llvm-gcc-4.2/bin/llvm-cpp-4.2"
 export CXX="$DEVROOT/usr/llvm-gcc-4.2/bin/llvm-g++-4.2"
@@ -56,10 +48,11 @@ export AR=$DEVROOT/usr/bin/ar
 export AS=$DEVROOT/usr/bin/as
 export NM=$DEVROOT/usr/bin/nm
 export RANLIB=$DEVROOT/usr/bin/ranlib
-export LDFLAGS="-L$SDKROOT/usr/lib/ -L$SHAREDLIBS/$SDKVER/$ARCH/lib"
+export LDFLAGS="-L$SDKROOT/usr/lib/ -L$PFX/lib/"
 
 export CPPFLAGS=$CFLAGS
 export CXXFLAGS=$CFLAGS
+export CCFLAGS=$CFLAGS
 
 if [ ! \( -d "$DEVROOT" \) ] ; then
    echo "The iPhone SDK could not be found. Folder \"$DEVROOT\" does not exist."
@@ -75,4 +68,4 @@ echo "Configuring for architecture: $ARCH..."
 echo "SDK Version: $SDKVER"
 echo "DevRoot: $DEVROOT"
 
-./configure --prefix="$PREFIX" --build="$ARCH-apple-darwin$BUILD_DARWIN_VER" --host="arm-apple-darwin10" --enable-static --disable-shared ac_cv_file__dev_zero=no ac_cv_func_setpgrp_void=yes $@
+./configure --build="$ARCH-apple-darwin$BUILD_DARWIN_VER" --host="arm-apple-darwin10" --enable-static --disable-shared ac_cv_file__dev_zero=no ac_cv_func_setpgrp_void=yes $@

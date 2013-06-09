@@ -1,65 +1,97 @@
 #!/bin/sh
 
-ARCHS=${ARCHS:-"armv7 i386"}
-#ALL_LIBS="FAAC LAME OGG OGGZ THEORA VORBIS SPEEX FLAC FISHSOUND MMS AACPLUS ID3LIB"
-ALL_LIBS="FAAC LAME OGG OGGZ THEORA VORBIS SPEEX FLAC MMS AACPLUS ID3LIB"
-#ALL_LIBS="AACPLUS ID3LIB"
+DEBUG=1
+
+ALL_LIBS="FFTW FAAC LAME OGG OGGZ THEORA VORBIS SPEEX FLAC MMS AACPLUS ID3LIB SNDFILE FISHSOUND"
+#ALL_LIBS="AACPLUS ID3LIB SNDFILE FISHSOUND"
 
 PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
 SDKVER=6.1
-SHAREDLIBS="/opt/ios"
 
 # configuration end
 
+source $(dirname $0)/functions.sh
+
+PREFIX="`pwd`/build"
+ARCHS=${ARCHS:-"armv7 i386"}
+
+LIPO=lipo
 SCRIPT_DIR=$( (cd -P $(dirname $0) && pwd) )
+DEPS_DIR=$SCRIPT_DIR/libs
 LOG_FILE="$SCRIPT_DIR/build_deps.log"
 IOS_CONFIG_SCRIPT_NAME="ios-configure"
 IOS_CONFIG_SCRIPT="$SCRIPT_DIR/$IOS_CONFIG_SCRIPT_NAME"
 
-FAAC_DIR="$SCRIPT_DIR/faac"
-FAAC_OPTIONS=""
+FAAC_DIR="$DEPS_DIR/faac"
+FAAC_OPTIONS="--with-mp4v2 --with-ogg="
+FAAC_LIB="libfaac.a"
 
-LAME_DIR="$SCRIPT_DIR/lame"
+FFTW_DIR="$DEPS_DIR/fftw"
+FFTW_OPTIONS="--enable-single --enable-float"
+FFTW_LIB="libfftw3.a"
+
+SNDFILE_DIR="$DEPS_DIR/libsndfile"
+SNDFILE_OPTIONS="--enable-experimental --disable-alsa --disable-test-coverate --disable-octave --disable-sqlite"
+#SNDFILE_OPTIONS=""
+SNDFILE_LIB="libsndfile.a"
+
+LAME_DIR="$DEPS_DIR/lame"
 LAME_OPTIONS="--disable-frontend --disable-nasm"
+LAME_LIB="libmp3lame.a"
 
-OGG_DIR="$SCRIPT_DIR/libogg"
+OGG_DIR="$DEPS_DIR/libogg"
 OGG_OPTIONS=""
+OGG_LIB="libogg.a"
 
-OGGZ_DIR="$SCRIPT_DIR/liboggz"
-OGGZ_OPTIONS="--enable-experimental  --disable-oggtest"
+OGGZ_DIR="$DEPS_DIR/liboggz"
+OGGZ_OPTIONS="--enable-experimental --disable-oggtest"
+OGGZ_LIB="liboggz.a"
 
-THEORA_DIR="$SCRIPT_DIR/libtheora"
-THEORA_OPTIONS="--disable-valgrind-testing --disable-oggtest --disable-vorbistest --disable-sdltest --disable-float --disable-encode --disable-examples"
+THEORA_DIR="$DEPS_DIR/libtheora"
+THEORA_OPTIONS="--disable-examples"
+THEORA_LIB="libtheora.a"
 
-VORBIS_DIR="$SCRIPT_DIR/libvorbis"
-VORBIS_OPTIONS="--disable-oggtest --disable-docs"
+VORBIS_DIR="$DEPS_DIR/libvorbis"
+VORBIS_OPTIONS="--disable-examples --disable-docs"
+VORBIS_LIB="libvorbis.a"
 
-SPEEX_DIR="$SCRIPT_DIR/speex"
-SPEEX_OPTIONS="--disable-oggtest"
+SPEEX_DIR="$DEPS_DIR/speex"
+SPEEX_OPTIONS=""
+SPEEX_LIB="libspeex.a"
 
-FLAC_DIR="$SCRIPT_DIR/flac"
+FLAC_DIR="$DEPS_DIR/flac"
 FLAC_OPTIONS="--disable-thorough-tests  --disable-doxygen-docs   --disable-xmms-plugin  --disable-oggtest --without-libiconv-prefix"
+FLAC_LIB="libflac.a"
 
-FISHSOUND_DIR="$SCRIPT_DIR/libfishsound"
+FISHSOUND_DIR="$DEPS_DIR/libfishsound"
 FISHSOUND_OPTIONS="--enable-experimental"
+FISHSOUND_LIB="libfishsound.a"
 
-MMS_DIR="$SCRIPT_DIR/libmms"
+MMS_DIR="$DEPS_DIR/libmms"
 MMS_OPTIONS=""
+MMS_LIB="libmms.a"
 
-AACPLUS_DIR="$SCRIPT_DIR/libaacplus"
-AACPLUS_OPTIONS="--without-fftw3 --with-parameter-expansion-string-replace-capable-shell=/bin/bash"
+AACPLUS_DIR="$DEPS_DIR/libaacplus"
+AACPLUS_OPTIONS="--with-fftw3 --with-parameter-expansion-string-replace-capable-shell=/bin/bash"
+AACPLUS_LIB="libaacplus.a"
 
-ID3LIB_DIR="$SCRIPT_DIR/id3lib"
+ID3LIB_DIR="$DEPS_DIR/id3lib"
 ID3LIB_OPTIONS=""
+ID3LIB_LIB="libid3.a"
 
 ### NO CHANGES FROM HERE ON
 
-if [ -n "$1" ]; then
-	ALL_LIBS="$1"
+if [ $DEBUG -eq 0 ]; then 
+exec 1> $LOG_FILE
+exec 2> $LOG_FILE
 fi
 
 if [ -n "$2" ]; then
-	ARCHS="$2"
+    ARCHS="$2"
+fi
+
+if [ -n "$1" ]; then
+    PREFIX=$(realpath "$1")
 fi
 
 export SDKVER
@@ -93,12 +125,31 @@ fi
 # configure each
 for LIB in $ALL_LIBS
 do
+    export PFX_CURRENT=$PREFIX/$SDKVER
+
     # configure for each enabled arch
     for ARCH1 in $ARCHS
     do
 	echo "Building $LIB for architecture: $ARCH1..."
 	
 	export ARCH=$ARCH1
+	
+	export PFX=$PFX_CURRENT/$ARCH
+	export PFX_LIB=$PFX/lib
+	export PFX_INC=$PFX/include
+
+#	export VORBIS_LIBS=$PFX_LIB
+#	export VORBISENC_LIBS=$PFX_LIB
+#	export SPEEX_LIBS=$PFX_LIB
+#	export FLAC_LIBS=$PFX_LIB
+#	export OGGZ_LIBS=$PFX_LIB
+#	export SNDFILE_LIBS=$PFX_LIB
+
+#	export FLAC_CFLAGS="-I$PFX_INC/FLAC"
+#	export OGG_CFLAGS="-I$PFX_INC/ogg"
+#	export SPEEX_CFLAGS="-I$PFX_INC/speex"
+#	export VORBIS_CFLAGS="-I$PFX_INC/vorbis"
+#	export VORBISENC_CFLAGS="-I$PFX_INC/vorbis"
 
 	case $ARCH in
     	    armv6)
@@ -129,13 +180,17 @@ do
     
 	# extra options depending on arch for THEORA/VORBIS/SPEEX
 	if [ $LIB = "THEORA" ] || [ $LIB = "VORBIS" ] || [ $LIB = "SPEEX" ] || [ $LIB = "FLAC" ] || [ $LIB = "OGGZ" ] ; then
-	    EXTRA_CONFIGURE_FLAGS="$EXTRA_CONFIGURE_FLAGS --with-ogg=$SHAREDLIBS/$SDKVER/$ARCH --with-ogg-libraries=$SHAREDLIBS/$SDKVER/$ARCH/lib/ --with-ogg-includes=$SHAREDLIBS/$SDKVER/$ARCH/include/"
+	    EXTRA_CONFIGURE_FLAGS="$EXTRA_CONFIGURE_FLAGS --with-ogg=$PFX --with-ogg-libraries=$PFX_LIB --with-ogg-includes=$PFX_INC"
 	fi
 	
 	if [ $LIB = "THEORA" ]; then
-	    EXTRA_CONFIGURE_FLAGS="$EXTRA_CONFIGURE_FLAGS --with-vorbis=$SHAREDLIBS/$SDKVER/$ARCH --with-vorbis-includes=$SHAREDLIBS/$SDKVER/$ARCH/include/ --with-vorbis-libraries=$SHAREDLIBS/$SDKVER/$ARCH/lib/"
+	    EXTRA_CONFIGURE_FLAGS="$EXTRA_CONFIGURE_FLAGS --with-vorbis=$PFX --with-vorbis-includes=$PFX_INC --with-vorbis-libraries=$PFX_LIB"
 	fi
     
+	if [ $LIB = "AACPLUS" ]; then
+	    EXTRA_CONFIGURE_FLAGS="--with-fftw3-prefix=$PFX"
+	fi
+
 	# copy ios configure script
 	LIB_F=$LIB"_DIR"
 	eval LIB_DIR='${'$LIB_F'}'
@@ -146,12 +201,13 @@ do
 
 	# clean
 	make clean > /dev/null 2>&1
+	make distclean > /dev/null 2>&1
 
 	# run the ios configure script
 	LIB_F=$LIB"_OPTIONS"
 	eval CONFIG_OPTIONS='${'$LIB_F'}'
     
-	./ios-configure $CONFIG_OPTIONS $EXTRA_CONFIGURE_FLAGS >> $LOG_FILE 2>&1
+	./ios-configure --prefix=$PFX $CONFIG_OPTIONS $EXTRA_CONFIGURE_FLAGS
     
 	[ $? -eq 0 ] || {
 	    echo "Error while configuring $LIB."
@@ -159,8 +215,8 @@ do
 	}
     
 	# make 
-	make >> $LOG_FILE 2>&1 &&
-	make install >> $LOG_FILE 2>&1
+	make &&
+	make install
     
 	[ $? -eq 0 ] || {
 	    echo "Error while making $LIB."
@@ -169,21 +225,23 @@ do
 
 	cd ..
     done
+
+    # combine all archs
+    #echo "Combining architectures..."
+    #COMBINE_F=$LIB"_LIB"
+    #eval COMBINE_LIB='${'$COMBINE_F'}'
+    #echo $COMBINE_LIB
+
+    #cd "$SCRIPT_DIR"
+    #$SCRIPT_DIR/combine.sh "$PFX_CURRENT" "$COMBINE_LIB"
+
+    #[ $? -eq 0 ] || {
+    #	echo Error while combining archs for lib: $LIB
+    #	exit 6
+    #}
+
 done
-
+    
 echo "All deps built successfully!"
-
-# combine all
-echo "Combining architectures..."
-cd "$SCRIPT_DIR"
-$SCRIPT_DIR/combine.sh
-
-[ $? -eq 0 ] || {
-	echo "Error while combining archs"
-	exit 6
-}
-
-# output the end result
-lipo -info $SHAREDLIBS/$SDKVER/fat/lib/*
 
 exit 0

@@ -1,0 +1,11 @@
+sed -i '.bck' -e 's/libtool/glibtool/' autogen.sh
+
+# libtool on osx is quite different from the gnu libtool, which is called glibtool on osx
+sed -i '.bck' -e 's/libtool/glibtool/' autogen.sh
+./autogen.sh
+make && make install
+cd ..
+The new version of autoconf requires that you replace AM_CONFIG_HEADER in configure.ac at line 8 with AC_CONFIG_HEADERS. If you don't make this change you will see the following error message in the terminal:
+
+configure.ac:8: error: 'AM_CONFIG_HEADER': this macro is obsolete.
+    You should use the 'AC_CONFIG_HEADERS' macro instead.
