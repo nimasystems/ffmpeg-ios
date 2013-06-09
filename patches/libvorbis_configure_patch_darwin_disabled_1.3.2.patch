@@ -1,5 +1,5 @@
 *** ./configure	2010-11-01 21:30:14.000000000 +0200
---- ../libvorbis/configure	2012-05-04 18:08:37.000000000 +0300
+--- ../libs/libvorbis/configure	2012-05-04 18:08:37.000000000 +0300
 ***************
 *** 11948,11955 ****
   		PROFILE="-pg -g -O20 -D__NO_MATH_INLINES -fsigned-char $sparc_cpu" ;;
