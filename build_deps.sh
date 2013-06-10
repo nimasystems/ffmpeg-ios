@@ -2,8 +2,8 @@
 
 DEBUG=1
 
-ALL_LIBS="FFTW FAAC LAME OGG OGGZ THEORA VORBIS SPEEX FLAC MMS AACPLUS ID3LIB SNDFILE FISHSOUND"
-#ALL_LIBS="LAME"
+#ALL_LIBS="FFTW OPUS FREETYPE FAAC LAME OGG OGGZ X264 THEORA VORBIS SPEEX FLAC MMS AACPLUS ID3LIB SNDFILE FISHSOUND"
+ALL_LIBS="FISHSOUND"
 
 PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
 SDKVER=6.1
@@ -14,6 +14,7 @@ source $(dirname $0)/functions.sh
 
 PREFIX="`pwd`/build"
 ARCHS=${ARCHS:-"armv7 i386"}
+#ARCHS="i386"
 
 LIPO=lipo
 SCRIPT_DIR=$( (cd -P $(dirname $0) && pwd) )
@@ -22,62 +23,67 @@ LOG_FILE="$SCRIPT_DIR/build_deps.log"
 IOS_CONFIG_SCRIPT_NAME="ios-configure"
 IOS_CONFIG_SCRIPT="$SCRIPT_DIR/$IOS_CONFIG_SCRIPT_NAME"
 
+FREETYPE_DIR="$DEPS_DIR/freetype"
+FREETYPE_OPTIONS=""
+
+VPX_DIR="$DEPS_DIR/libvpx"
+VPX_OPTIONS="--disable-ccache --disable-docs --disable-examples --disable-unit-tests"
+
+OPUS_DIR="$DEPS_DIR/opus"
+OPUS_OPTIONS=""
+
+X264_DIR="$DEPS_DIR/x264"
+X264_OPTIONS="--disable-cli --disable-debug --disable-asm"
+X264_OPTIONS_i386="--disable-cli --disable-debug"
+
+ICONV_DIR="$DEPS_DIR/libiconv"
+ICONV_OPTIONS="--enable-extra-encodings"
+
 FAAC_DIR="$DEPS_DIR/faac"
 FAAC_OPTIONS="--with-mp4v2 --with-ogg="
-FAAC_LIB="libfaac.a"
 
 FFTW_DIR="$DEPS_DIR/fftw"
-FFTW_OPTIONS="--enable-single --enable-float"
-FFTW_LIB="libfftw3.a"
+FFTW_OPTIONS="--enable-single --enable-float --enable-neon --disable-fma"
+FFTW_OPTIONS_i386="--enable-single --enable-float --disable-fma"
+# must enable #define ARM_NEON_GCC_COMPATIBILITY in simd-neon.h in order for NEON functions to build properly!
 
 SNDFILE_DIR="$DEPS_DIR/libsndfile"
 SNDFILE_OPTIONS="--enable-experimental --disable-alsa --disable-test-coverate --disable-octave --disable-sqlite"
 #SNDFILE_OPTIONS=""
-SNDFILE_LIB="libsndfile.a"
 
 LAME_DIR="$DEPS_DIR/lame"
-LAME_OPTIONS="--disable-frontend --disable-nasm"
-LAME_LIB="libmp3lame.a"
+LAME_OPTIONS="--disable-frontend --enable-nasm"
 
 OGG_DIR="$DEPS_DIR/libogg"
 OGG_OPTIONS=""
-OGG_LIB="libogg.a"
 
 OGGZ_DIR="$DEPS_DIR/liboggz"
 OGGZ_OPTIONS="--enable-experimental --disable-oggtest"
-OGGZ_LIB="liboggz.a"
 
 THEORA_DIR="$DEPS_DIR/libtheora"
 THEORA_OPTIONS="--disable-examples"
-THEORA_LIB="libtheora.a"
 
 VORBIS_DIR="$DEPS_DIR/libvorbis"
 VORBIS_OPTIONS="--disable-examples --disable-docs"
-VORBIS_LIB="libvorbis.a"
 
 SPEEX_DIR="$DEPS_DIR/speex"
 SPEEX_OPTIONS=""
-SPEEX_LIB="libspeex.a"
 
 FLAC_DIR="$DEPS_DIR/flac"
-FLAC_OPTIONS="--disable-thorough-tests  --disable-doxygen-docs   --disable-xmms-plugin  --disable-oggtest --without-libiconv-prefix"
-FLAC_LIB="libflac.a"
+FLAC_OPTIONS="--disable-thorough-tests --disable-doxygen-docs --disable-xmms-plugin --disable-oggtest --disable-thorough-tests"
+FLAC_OPTIONS_i386="--disable-thorough-tests --disable-doxygen-docs --disable-xmms-plugin --disable-oggtest --disable-sse --disable-3dnow --disable-altivec --disable-thorough-tests --disable-asm-optimizations"
 
 FISHSOUND_DIR="$DEPS_DIR/libfishsound"
 FISHSOUND_OPTIONS="--enable-experimental"
-FISHSOUND_LIB="libfishsound.a"
 
 MMS_DIR="$DEPS_DIR/libmms"
 MMS_OPTIONS=""
-MMS_LIB="libmms.a"
 
 AACPLUS_DIR="$DEPS_DIR/libaacplus"
 AACPLUS_OPTIONS="--with-fftw3 --with-parameter-expansion-string-replace-capable-shell=/bin/bash"
-AACPLUS_LIB="libaacplus.a"
 
 ID3LIB_DIR="$DEPS_DIR/id3lib"
 ID3LIB_OPTIONS=""
-ID3LIB_LIB="libid3.a"
 
 ### NO CHANGES FROM HERE ON
 
@@ -131,7 +137,7 @@ do
     for ARCH1 in $ARCHS
     do
 	echo "Building $LIB for architecture: $ARCH1..."
-	
+
 	export ARCH=$ARCH1
 	
 	export PFX=$PFX_CURRENT/$ARCH
@@ -150,6 +156,14 @@ do
 #	export SPEEX_CFLAGS="-I$PFX_INC/speex"
 #	export VORBIS_CFLAGS="-I$PFX_INC/vorbis"
 #	export VORBISENC_CFLAGS="-I$PFX_INC/vorbis"
+
+	# create the dir
+	mkdir -p $PFX
+	mkdir -p "$PFX/include"
+
+	# workaround a compilation error for a missing header file in the iOS SDK
+	# which some libraries depend on
+	touch "$PFX/include/crt_externs.h"
 
 	case $ARCH in
     	    armv6)
@@ -190,6 +204,14 @@ do
 	if [ $LIB = "AACPLUS" ]; then
 	    EXTRA_CONFIGURE_FLAGS="--with-fftw3-prefix=$PFX"
 	fi
+	
+	if [ $LIB = "VPX" ]; then
+	    if [ $ARCH = "armv7" ]; then
+		EXTRA_CONFIGURE_FLAGS="--target=armv7-darwin-gcc"
+	    else
+		EXTRA_CONFIGURE_FLAGS="--target=x86-darwin10-gcc"
+	    fi
+	fi
 
 	# copy ios configure script
 	LIB_F=$LIB"_DIR"
@@ -205,9 +227,15 @@ do
 
 	# run the ios configure script
 	LIB_F=$LIB"_OPTIONS"
-	eval CONFIG_OPTIONS='${'$LIB_F'}'
-    
-	./ios-configure --prefix=$PFX $CONFIG_OPTIONS $EXTRA_CONFIGURE_FLAGS
+	LIB_FC=$LIB_F"_"$ARCH
+	
+	eval CONFIG_OPTIONS='${'$LIB_FC'}'
+	
+	if [ "$CONFIG_OPTIONS" == "" ] ; then
+	    eval CONFIG_OPTIONS='${'$LIB_F'}'
+	fi
+
+	./ios-configure --prefix=$PFX $CONFIG_OPTIONS $EXTRA_CONFIGURE_FLAGS --disable-programs --disable-debug
     
 	[ $? -eq 0 ] || {
 	    echo "Error while configuring $LIB."

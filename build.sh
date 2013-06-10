@@ -82,14 +82,16 @@ do
     --extra-ldflags="-L${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk/usr/lib/system -L$PREFIX/$IOSSDKVERSION/$ARCH/lib" \
     --cross-prefix="${PLATFORM}/Developer/usr/bin/" \
     --sysroot="${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk" \
+    --enable-neon \
     --disable-doc \
+    --disable-debug \
     --disable-ffmpeg \
     --disable-ffplay \
     --disable-ffserver \
     --disable-ffprobe \
     --disable-decoder=h264,svq3 \
     --disable-parser=h264 \
-    --as="gas-preprocessor.pl ${PLATFORM}/Applications/Xcode.app/Contents/Developer/usr/bin/as" \
+    --as="/usr/bin/gas-preprocessor.pl ${PLATFORM}/Applications/Xcode.app/Contents/Developer/usr/bin/as" \
     --extra-ldflags="-arch $ARCH -L$PREFIX/$IOSSDKVERSION/$ARCH/lib" \
     --extra-cflags="-arch $ARCH $EXTRA_CFLAGS" \
     --extra-cxxflags="-arch $ARCH" \

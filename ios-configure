@@ -64,8 +64,20 @@ if [ ! \( -d "$SDKROOT" \) ] ; then
    exit 1
 fi
 
+export HOST=""
+
+if [ "$ARCH" == "armv7" ] ; then
+    HOST="arm-apple-darwin10"
+else
+    HOST="i386-apple-darwin10"
+fi
+
 echo "Configuring for architecture: $ARCH..."
 echo "SDK Version: $SDKVER"
 echo "DevRoot: $DEVROOT"
+echo $HOST
 
-./configure --build="$ARCH-apple-darwin$BUILD_DARWIN_VER" --host="arm-apple-darwin10" --enable-static --disable-shared ac_cv_file__dev_zero=no ac_cv_func_setpgrp_void=yes $@
+
+
+#./configure --enable-extra-warnings --enable-static --disable-shared $@
+./configure --build="$ARCH-apple-darwin$BUILD_DARWIN_VER" --host=$HOST --enable-static --disable-shared ac_cv_file__dev_zero=no ac_cv_func_setpgrp_void=yes $@
