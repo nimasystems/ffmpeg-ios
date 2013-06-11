@@ -37,6 +37,7 @@ export RANLIB="$DEVROOT/usr/bin/ranlib"
 export CFLAGS="-arch $ARCH -pipe -no-cpp-precomp -isysroot $SDKROOT --sysroot $SDKROOT -I$SDKROOT/usr/include -I$PFX/include"
 #export CFLAGS="-arch $ARCH -pipe -no-cpp-precomp -isysroot $SDKROOT --sysroot $SDKROOT -I$SDKROOT/usr/include -I$PFX/include -I$PFX/include/speex -I$PFX/include/FLAC -I$PFX/include/FLAC++ -I$PFX/include/lame -I$PFX/include/libmms -I$PFX/include/ogg -I$PFX/include/oggz -I$PFX/include/theora -I$PFX/include/vorbis"
 #export CFLAGS="$CFLAGS"
+export XCFLAGS=$CFLAGS
 
 #export CPP="$DEVROOT/usr/llvm-gcc-4.2/bin/llvm-cpp-4.2"
 export CXX="$DEVROOT/usr/llvm-gcc-4.2/bin/llvm-g++-4.2"
@@ -49,6 +50,7 @@ export AS=$DEVROOT/usr/bin/as
 export NM=$DEVROOT/usr/bin/nm
 export RANLIB=$DEVROOT/usr/bin/ranlib
 export LDFLAGS="-L$SDKROOT/usr/lib/ -L$PFX/lib/"
+export XLDFLAGS=$LDFLAGS
 
 export CPPFLAGS=$CFLAGS
 export CXXFLAGS=$CFLAGS

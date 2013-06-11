@@ -47,6 +47,14 @@ do
     fi
   fi
 
+  if [ "$LIB" == "libcrypto.a" ] ; then
+	continue
+  fi
+
+  if [ "$LIB" == "libssl.a" ] ; then
+        continue
+  fi
+
   LIPO_CREATE=""
 
   for ARCH in $ARCHS

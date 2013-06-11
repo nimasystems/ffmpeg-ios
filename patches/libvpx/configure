@@ -1,0 +1,13 @@
+#!/bin/bash
+
+EXFLAGS=-I$PFX/include
+
+if [ "$ARCH" == "armv7" ] ; then
+
+./cfg --prefix=$PFX --target=armv7-darwin-gcc --extra --extra-cflags=$EXFLAGS --disable-install-bins --disable-examples --disable-docs --sdk-path=$DEVROOT --enable-vp8 --disable-vp9
+
+else
+
+./cfg --prefix=$PFX --target=armv7-darwin-gcc --extra --extra-cflags=$EXFLAGS --disable-install-bins --disable-examples --disable-docs --sdk-path=$DEVROOT --enable-vp8 --disable-vp9
+
+fi

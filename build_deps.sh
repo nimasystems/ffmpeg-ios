@@ -2,8 +2,9 @@
 
 DEBUG=1
 
-#ALL_LIBS="FFTW OPUS FREETYPE FAAC LAME OGG OGGZ X264 THEORA VORBIS SPEEX FLAC MMS AACPLUS ID3LIB SNDFILE FISHSOUND"
-ALL_LIBS="FISHSOUND"
+ALL_LIBS="FFTW ICONV EXPAT FREETYPE FONTCONFIG FRIBIDI ASS GSM RTPMDUMP OPUS \ 
+FLITE HARFBUZZ FAAC LAME OGG OGGZ X264 THEORA VORBIS SPEEX FLAC MMS AACPLUS ID3LIB SNDFILE FISHSOUND"
+#ALL_LIBS="GSM"
 
 PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
 SDKVER=6.1
@@ -22,6 +23,39 @@ DEPS_DIR=$SCRIPT_DIR/libs
 LOG_FILE="$SCRIPT_DIR/build_deps.log"
 IOS_CONFIG_SCRIPT_NAME="ios-configure"
 IOS_CONFIG_SCRIPT="$SCRIPT_DIR/$IOS_CONFIG_SCRIPT_NAME"
+
+VPX_DIR="$DEPS_DIR/libvpx"
+VPX_OPTIONS=""
+
+RTMPDUMP_DIR="$DEPS_DIR/rtmpdump/librtmp"
+RTMPDUMP_OPTIONS=""
+
+AMRNB_DIR="$DEPS_DIR/amrnb"
+AMRNB_OPTIONS="--with-parameter-expansion-string-replace-capable-shell=/bin/bash"
+
+GSM_DIR="$DEPS_DIR/gsm"
+GSM_OPTIONS=""
+
+FRIBIDI_DIR="$DEPS_DIR/fribidi"
+FRIBIDI_OPTIONS="--without-glib"
+
+RECODE_DIR="$DEPS_DIR/recode"
+RECODE_OPTIONS="--without-libintl-prefix"
+
+EXPAT_DIR="$DEPS_DIR/expat"
+EXPAT_OPTIONS=""
+
+ASS_DIR="$DEPS_DIR/libass"
+ASS_OPTIONS="--disable-test "
+
+FONTCONFIG_DIR="$DEPS_DIR/fontconfig"
+FONTCONFIG_OPTIONS=""
+
+HARFBUZZ_DIR="$DEPS_DIR/harfbuzz"
+HARFBUZZ_OPTIONS="--with-coretext=no --with-glib=no --with-freetype=yes --with-cairo=no --with-uniscribe=no"
+
+FLITE_DIR="$DEPS_DIR/flite"
+FLITE_OPTIONS=""
 
 FREETYPE_DIR="$DEPS_DIR/freetype"
 FREETYPE_OPTIONS=""
@@ -203,6 +237,10 @@ do
     
 	if [ $LIB = "AACPLUS" ]; then
 	    EXTRA_CONFIGURE_FLAGS="--with-fftw3-prefix=$PFX"
+	fi
+
+	if [ $LIB = "RECODE" ]; then
+	    EXTRA_CONFIGURE_FLAGS="--with-libiconv-prefix=$PFX"
 	fi
 	
 	if [ $LIB = "VPX" ]; then
