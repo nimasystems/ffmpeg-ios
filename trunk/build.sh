@@ -5,6 +5,7 @@ IOSSDKVERSION=6.1
 PREFIX="`pwd`/build"
 
 ARCHS=${ARCHS:-"armv7 i386"}
+ARCHS=i386
 ARCHFAT="fat"
 
 set -e
@@ -24,6 +25,7 @@ export SDKROOT="$DEVROOT/SDKs/iPhoneOS$IOSSDKVERSION.sdk"
 for ARCH in $ARCHS
 do
     export PFX=$PREFIX/$IOSSDKVERSION/$ARCH
+    export pkg_config=/opt/local/bin/pkg-config
     export PKG_CONFIG_PATH=$SDKROOT/usr/lib/pkgconfig:$DEVROOT/usr/lib/pkgconfig:$PFX/lib/pkgconfig
 
     FFMPEG_DIR=$SCRIPT_DIR/dist/ffmpeg-$ARCH
@@ -47,13 +49,13 @@ do
             IOSSDK=iPhoneOS${IOSSDKVERSION}
             ;;
         armv7)
-            EXTRA_FLAGS="--cpu=cortex-a8 --enable-pic"
+            EXTRA_FLAGS="--cpu=cortex-a8 --enable-pic --enable-neon --enable-asm --enable-yasm"
             EXTRA_CFLAGS="-mfpu=neon -I$DIST_DIR/include"
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
             IOSSDK=iPhoneOS${IOSSDKVERSION}
             ;;
         i386)
-            EXTRA_FLAGS="--enable-pic"
+            EXTRA_FLAGS="--enable-pic --disable-decoder=h264,svq3 --disable-parser=h264"
             EXTRA_CFLAGS=""
             PLATFORM="${PLATFORMBASE}/iPhoneSimulator.platform"
             IOSSDK=iPhoneSimulator${IOSSDKVERSION}
@@ -71,32 +73,40 @@ do
     --enable-zlib \
     --enable-version3 \
     --enable-nonfree \
+    --enable-gpl \
     --enable-libmp3lame \
     --enable-libspeex \
     --enable-libtheora \
     --enable-libfaac \
     --enable-libvorbis \
     --enable-libaacplus \
+    --enable-libflite \
+    --enable-libfreetype \
+    --enable-libopus \
+    --enable-libx264 \
+    --enable-openssl \
     --prefix=$DIST_DIR \
     --enable-cross-compile --target-os=darwin --arch=$ARCH \
     --extra-ldflags="-L${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk/usr/lib/system -L$PREFIX/$IOSSDKVERSION/$ARCH/lib" \
     --cross-prefix="${PLATFORM}/Developer/usr/bin/" \
     --sysroot="${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk" \
-    --enable-neon \
     --disable-doc \
     --disable-debug \
     --disable-ffmpeg \
     --disable-ffplay \
     --disable-ffserver \
     --disable-ffprobe \
-    --disable-decoder=h264,svq3 \
-    --disable-parser=h264 \
+    --disable-htmlpages \
+    --disable-manpages \
+    --disable-podpages \
+    --disable-txtpages \
+    --disable-programs \
     --as="/usr/bin/gas-preprocessor.pl ${PLATFORM}/Applications/Xcode.app/Contents/Developer/usr/bin/as" \
     --extra-ldflags="-arch $ARCH -L$PREFIX/$IOSSDKVERSION/$ARCH/lib" \
     --extra-cflags="-arch $ARCH $EXTRA_CFLAGS" \
     --extra-cxxflags="-arch $ARCH" \
     $EXTRA_FLAGS
-
+    
     echo "Installing ffmpeg for $ARCH..."
 
     make clean
