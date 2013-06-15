@@ -39,6 +39,7 @@ mkdir -p $OUTPUT_DIR/lib $OUTPUT_DIR/include
 for LIB in $PREFIX/$MAIN_ARCH/lib/*.a
 do
 
+  LIBF=$LIB
   LIB=`basename $LIB`
 
   if [ ! -z "$SELECTED_LIB" ] ; then
@@ -48,10 +49,12 @@ do
   fi
 
   if [ "$LIB" == "libcrypto.a" ] ; then
+	cp $LIBF $OUTPUT_DIR/lib/$LIB
 	continue
   fi
 
   if [ "$LIB" == "libssl.a" ] ; then
+        cp $LIBF $OUTPUT_DIR/lib/$LIB
         continue
   fi
 

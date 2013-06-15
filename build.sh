@@ -5,7 +5,7 @@ IOSSDKVERSION=6.1
 PREFIX="`pwd`/build"
 
 ARCHS=${ARCHS:-"armv7 i386"}
-ARCHS=i386
+#ARCHS=i386
 ARCHFAT="fat"
 
 set -e
@@ -55,7 +55,7 @@ do
             IOSSDK=iPhoneOS${IOSSDKVERSION}
             ;;
         i386)
-            EXTRA_FLAGS="--enable-pic --disable-decoder=h264,svq3 --disable-parser=h264"
+            EXTRA_FLAGS="--enable-pic"
             EXTRA_CFLAGS=""
             PLATFORM="${PLATFORMBASE}/iPhoneSimulator.platform"
             IOSSDK=iPhoneSimulator${IOSSDKVERSION}
@@ -83,7 +83,7 @@ do
     --enable-libflite \
     --enable-libfreetype \
     --enable-libopus \
-    --enable-libx264 \
+    --disable-libx264 \
     --enable-openssl \
     --prefix=$DIST_DIR \
     --enable-cross-compile --target-os=darwin --arch=$ARCH \
@@ -101,6 +101,8 @@ do
     --disable-podpages \
     --disable-txtpages \
     --disable-programs \
+    --disable-decoder=h264,h264chroma,svq3 \
+    --disable-parser=h264,h264chroma \
     --as="/usr/bin/gas-preprocessor.pl ${PLATFORM}/Applications/Xcode.app/Contents/Developer/usr/bin/as" \
     --extra-ldflags="-arch $ARCH -L$PREFIX/$IOSSDKVERSION/$ARCH/lib" \
     --extra-cflags="-arch $ARCH $EXTRA_CFLAGS" \

@@ -2,9 +2,10 @@
 
 DEBUG=1
 
-ALL_LIBS="FFTW ICONV EXPAT FREETYPE FONTCONFIG FRIBIDI ASS GSM RTPMDUMP OPUS \ 
-FLITE HARFBUZZ FAAC LAME OGG OGGZ X264 THEORA VORBIS SPEEX FLAC MMS AACPLUS ID3LIB SNDFILE FISHSOUND"
-#ALL_LIBS="GSM"
+#ALL_LIBS="FFTW ICU ICONV EXPAT FREETYPE FONTCONFIG FRIBIDI ASS GSM RTPMDUMP OPUS \ 
+#FLITE HARFBUZZ FAAC LAME OGG OGGZ X264 THEORA VORBIS SPEEX FLAC MMS AACPLUS ID3LIB SNDFILE FISHSOUND"
+ALL_LIBS="SQLITE_CIPHER"
+#ALL_LIBS="ICU"
 
 PLATFORMBASE="/Applications/Xcode.app/Contents/Developer/Platforms"
 SDKVER=6.1
@@ -15,7 +16,7 @@ source $(dirname $0)/functions.sh
 
 PREFIX="`pwd`/build"
 ARCHS=${ARCHS:-"armv7 i386"}
-#ARCHS="i386"
+ARCHS="i386"
 
 LIPO=lipo
 SCRIPT_DIR=$( (cd -P $(dirname $0) && pwd) )
@@ -23,6 +24,12 @@ DEPS_DIR=$SCRIPT_DIR/libs
 LOG_FILE="$SCRIPT_DIR/build_deps.log"
 IOS_CONFIG_SCRIPT_NAME="ios-configure"
 IOS_CONFIG_SCRIPT="$SCRIPT_DIR/$IOS_CONFIG_SCRIPT_NAME"
+
+ICU_DIR="$DEPS_DIR/icu/source"
+ICU_OPTIONS="--disable-shared --enable-static"
+
+SQLITE_CIPHER_DIR="$DEPS_DIR/sqlcipher"
+SQLITE_CIPHER_OPTIONS=""
 
 VPX_DIR="$DEPS_DIR/libvpx"
 VPX_OPTIONS=""
@@ -225,6 +232,9 @@ do
 	export SDKROOT
 	
 	EXTRA_CONFIGURE_FLAGS=""
+
+	LIB_F=$LIB"_DIR"
+	eval LIB_DIR='${'$LIB_F'}'
     
 	# extra options depending on arch for THEORA/VORBIS/SPEEX
 	if [ $LIB = "THEORA" ] || [ $LIB = "VORBIS" ] || [ $LIB = "SPEEX" ] || [ $LIB = "FLAC" ] || [ $LIB = "OGGZ" ] ; then
@@ -242,6 +252,19 @@ do
 	if [ $LIB = "RECODE" ]; then
 	    EXTRA_CONFIGURE_FLAGS="--with-libiconv-prefix=$PFX"
 	fi
+
+	if [ $LIB = "ICU" ]; then
+	    EXTRA_CONFIGURE_FLAGS="--with-cross-build=$LIB_DIR/hostbuild"
+	    export EXT_INC="-Wl,-dead_strip -miphoneos-version-min=2.0 -lstdc++ -I$LIB_DIR/tools/tzcode/"
+	    export EXT_CFLAGS="-DDARWIN -fno-common -Wall -g -O3 -ffast-math -fsigned-char -miphoneos-version-min=2.2"
+	fi
+
+	if [ $LIB = "SQLITE_CIPHER" ]; then
+	    EXTRA_CONFIGURE_FLAGS="--enable-tempstore=yes --disable-tcl --enable-static --disable-shared"
+	    export EXT_INC=""
+	    export EXT_LIBS="-lstdc++ -lcrypto -liconv -licudata -licuio -licule -liculx -licutest -licutu -licuuc -licui18n"
+	    export EXT_CFLAGS="-DSQLITE_ENABLE_ICU -DSQLITE_HAS_CODEC -DNDEBUG -DSQLITE_OS_UNIX=1 -DSQLITE_TEMP_STORE=2 -DSQLITE_THREADSAFE"
+	fi
 	
 	if [ $LIB = "VPX" ]; then
 	    if [ $ARCH = "armv7" ]; then
@@ -252,8 +275,6 @@ do
 	fi
 
 	# copy ios configure script
-	LIB_F=$LIB"_DIR"
-	eval LIB_DIR='${'$LIB_F'}'
 	rm -rf "$LIB_DIR/$IOS_CONFIG_SCRIPT_NAME" > /dev/null 2>&1
 	cp "$IOS_CONFIG_SCRIPT" "$LIB_DIR/$IOS_CONFIG_SCRIPT_NAME" > /dev/null 2>&1 || { echo "Could not copy ios configure script in $LIB_DIR"; exit 3; }
 
@@ -281,7 +302,7 @@ do
 	}
     
 	# make 
-	make &&
+	make VERBOSE=1 &&
 	make install
     
 	[ $? -eq 0 ] || {
