@@ -26,6 +26,8 @@ if [ -z $SDKROOT ]; then
     export SDKROOT="$DEVROOT/SDKs/iPhoneOS$SDKVER.sdk"
 fi
 
+export LIBS=$EXT_LIBS
+
 #export BUILD_DARWIN_VER=10
 export BUILD_DARWIN_VER=`uname -r`
 #export PKG_CONFIG_PATH=$SDKROOT/usr/lib/pkgconfig:$DEVROOT/usr/lib/pkgconfig
@@ -34,22 +36,25 @@ export AS="$DEVROOT/usr/bin/as"
 export ASCPP="$DEVROOT/usr/bin/as"
 export AR="$DEVROOT/usr/bin/ar"
 export RANLIB="$DEVROOT/usr/bin/ranlib"
-export CFLAGS="-arch $ARCH -pipe -no-cpp-precomp -isysroot $SDKROOT --sysroot $SDKROOT -I$SDKROOT/usr/include -I$PFX/include"
+export CFLAGS="-arch $ARCH -pipe -no-cpp-precomp -isysroot $SDKROOT --sysroot $SDKROOT -I$SDKROOT/usr/include -I$PFX/include $EXT_INC $EXT_CFLAGS"
 #export CFLAGS="-arch $ARCH -pipe -no-cpp-precomp -isysroot $SDKROOT --sysroot $SDKROOT -I$SDKROOT/usr/include -I$PFX/include -I$PFX/include/speex -I$PFX/include/FLAC -I$PFX/include/FLAC++ -I$PFX/include/lame -I$PFX/include/libmms -I$PFX/include/ogg -I$PFX/include/oggz -I$PFX/include/theora -I$PFX/include/vorbis"
 #export CFLAGS="$CFLAGS"
 export XCFLAGS=$CFLAGS
 
 #export CPP="$DEVROOT/usr/llvm-gcc-4.2/bin/llvm-cpp-4.2"
 export CXX="$DEVROOT/usr/llvm-gcc-4.2/bin/llvm-g++-4.2"
+#export CXX="/usr/bin/llvm-g++"
 #export CXXCPP="$DEVROOT/usr/llvm-gcc-4.2/bin/llvm-cpp-4.2"
 export CC="$DEVROOT/usr/llvm-gcc-4.2/bin/llvm-gcc-4.2"
+#export CC="/usr/bin/llvm-gcc"
 
 export LD=$DEVROOT/usr/bin/ld
 export AR=$DEVROOT/usr/bin/ar
 export AS=$DEVROOT/usr/bin/as
 export NM=$DEVROOT/usr/bin/nm
 export RANLIB=$DEVROOT/usr/bin/ranlib
-export LDFLAGS="-L$SDKROOT/usr/lib/ -L$PFX/lib/"
+#export LDFLAGS="-L$SDKROOT/usr/lib/ -L$PFX/lib/ $EXT_INC"
+export LDFLAGS="-L$SDKROOT/usr/lib/ -L$PFX/lib/ $EXT_INC"
 export XLDFLAGS=$LDFLAGS
 
 export CPPFLAGS=$CFLAGS
@@ -83,3 +88,4 @@ echo $HOST
 
 #./configure --enable-extra-warnings --enable-static --disable-shared $@
 ./configure --build="$ARCH-apple-darwin$BUILD_DARWIN_VER" --host=$HOST --enable-static --disable-shared ac_cv_file__dev_zero=no ac_cv_func_setpgrp_void=yes $@
+#./configure --host=arm-apple-darwin --enable-static --disable-shared ac_cv_file__dev_zero=no ac_cv_func_setpgrp_void=yes $@
